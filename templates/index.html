@@ -1,0 +1,60 @@
+{% extends '_layouts/cp' %}
+
+{% set title = 'Reroute'|t %}
+{% set reroutes = craft.reroute.getAll %}
+
+{% set content %}
+	{% if reroutes | length == 0 %}
+		<p id="no-reroutes">{{ 'There are no reroutes!'|t }}</p>
+	{% else %}
+		{# <div class="buttons">
+			<a href="{{ url('reroute/new') }}" class="btn submit add icon">{{ 'New Reroute'|t }}</a>
+		</div> #}
+
+		<table id="reroutes" class="data fullwidth">
+			<thead>
+				<th scope="col">{{ 'Old Url'|t }}</th>
+				<th scope="col">{{ 'New Url'|t }}</th>
+				<th scope="col">{{ 'Method'|t }}</th>
+				<th class="thin"></th>
+				<th scope="col">{{ 'Delete'|t }}</th>
+			</thead>
+			<tbody>
+				{% for reroute in reroutes %}
+					<tr data-id="{{ reroute.id }}" data-name="{{ 'Reroute for {url}' | t({ url: reroute.oldUrl }) }}">
+						<td><a href="{{ url('reroute/'~reroute.id) }}">{{ reroute.oldUrl }}</a></td>
+						<td>{{ reroute.newUrl }}</td>
+						<td>{{ reroute.method }}</td>
+						<td><a href="{{ reroute.oldUrl }}" target="_blank" class="go">{{ 'View'|t }}</a></td>
+						<td><a class="delete icon" title="{{ 'Delete'|t }}"></a></td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	{% endif %}
+
+	<div class="buttons">
+		<a href="{{ url('reroute/new') }}" class="btn submit add icon">{{ 'Add Single Reroute'|t }}</a>
+    </div>
+
+    <form method="post" action="" class="upload" style="margin-top: 80px;" enctype="multipart/form-data">
+        <input type="hidden" name="action" value="reroute/upload">
+        <input type="hidden" name="redirect" value="reroute">
+        <input type="hidden" name="{{ craft.config.csrfTokenName }}" value="{{ craft.request.csrfToken }}">
+
+        <input type="file" name="csv" style="display: block;" accept=".csv">
+        <input type="submit" class="btn submit add icon" value="Add Batch Reroutes" style="margin-top: 20px;">
+        <p style="font-size: 12px; margin-top: 3px;">* Please only upload csv file without any header row.</p>
+    </from>
+
+{% endset %}
+
+{% set js %}
+	new Craft.AdminTable({
+		tableSelector: '#reroutes',
+		noObjectsSelector: '#no-reroutes',
+		deleteAction: 'reroute/delete'
+	});
+{% endset %}
+
+{% includeJs js %}
